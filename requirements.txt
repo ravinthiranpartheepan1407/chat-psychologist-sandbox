@@ -1,0 +1,17 @@
+langchain
+pypdf
+fastembed
+chromadb
+fastapi
+python-multipart
+pandas
+pytube
+moviepy
+fpdf
+SpeechRecognition
+googletrans
+gtts
+pyttsx3
+streamlit-chat
+streamlit
+langchain-community
