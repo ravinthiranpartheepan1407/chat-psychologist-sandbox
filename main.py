@@ -27,16 +27,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown(
-    """
-    <style>
-    .st-emotion-cache-h4xjwg ezrtsby2 {
-        display: none;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown(hide_github_icon, unsafe_allow_html=True)
 
 def display_messages():
     st.subheader("RAG-NET Sandbox")
