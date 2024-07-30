@@ -7,6 +7,7 @@ from rag import ChatPDF
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+import sqlite3
 
 st.set_page_config(
     page_title="Chat Psychologist AI Sandbox"
