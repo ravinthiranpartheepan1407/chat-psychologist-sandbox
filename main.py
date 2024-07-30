@@ -4,6 +4,10 @@ import streamlit as st
 from streamlit_chat import message
 from rag import ChatPDF
 
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
 st.set_page_config(
     page_title="Chat Psychologist AI Sandbox"
 )
