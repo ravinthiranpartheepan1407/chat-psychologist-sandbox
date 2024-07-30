@@ -4,6 +4,13 @@ import streamlit as st
 from streamlit_chat import message
 from rag import ChatPDF
 
+hide_github_icon = """
+#GithubIcon {
+  visibility: hidden;
+}
+"""
+
+
 st.set_page_config(
     page_title="Chat Psychologist AI Sandbox"
 )
@@ -19,6 +26,8 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+st.markdown(hide_github_icon, unsafe_allow_html=True)
 
 def display_messages():
     st.subheader("RAG-NET Sandbox")
