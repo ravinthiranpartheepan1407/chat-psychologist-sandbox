@@ -35,8 +35,14 @@ def process_input():
     if st.session_state["user_input"] and len(st.session_state["user_input"].strip()) > 0:
         user_text = st.session_state["user_input"].strip()
         with st.session_state["thinking_spinner"], st.spinner("RAG-NET in Progress"):
-            response = requests.get(f"https://arkhammapi.com/ask/?query={user_text}")
-            agent_text = response.json().get("response", "Error: No response from the server.")
+            try:
+                response = requests.get(f"https://arkhammapi.com/ask/?query={user_text}")
+                response.raise_for_status()  # Raise an exception for HTTP errors
+                agent_text = response.json().get("response", "Error: No response from the server.")
+            except requests.exceptions.RequestException as e:
+                agent_text = f"Error: {e}"
+            except ValueError as e:
+                agent_text = f"Error: Unable to decode JSON response: {e}. Response content: {response.text}"
 
         st.session_state["messages"].append((user_text, True))
         st.session_state["messages"].append((agent_text, False))
@@ -49,12 +55,15 @@ def upload_and_ingest(file):
 
     # Upload the file to the API
     with st.session_state["ingestion_spinner"], st.spinner(f"Ingesting {file.name}"):
-        form_data = {"file": file}
-        response = requests.post('https://arkhammapi.com/upload/', files=form_data)
-        if response.status_code == 200:
+        try:
+            form_data = {"file": (file.name, file, "application/pdf")}
+            response = requests.post('https://arkhammapi.com/upload/', files=form_data)
+            response.raise_for_status()  # Raise an exception for HTTP errors
             st.success("File uploaded successfully and ingested.")
-        else:
-            st.error(f"Failed to upload file: {response.json().get('detail', 'Unknown error')}")
+        except requests.exceptions.RequestException as e:
+            st.error(f"Failed to upload file: {e}")
+        except ValueError as e:
+            st.error(f"Failed to upload file. Unable to decode JSON response: {e}. Response content: {response.text}")
 
 # Main page function
 def page():
