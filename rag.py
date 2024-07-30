@@ -15,7 +15,8 @@ class ChatPDF:
     chain = None
 
     def __init__(self):
-        self.model = ChatOllama(model="llama2:7b-chat")
+        # Initialize ChatOllama correctly
+        self.model = ChatOllama(model_name="llama2:7b-chat")
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100)
         self.prompt = PromptTemplate.from_template(
             """
@@ -33,7 +34,9 @@ class ChatPDF:
         chunks = self.text_splitter.split_documents(docs)
         chunks = filter_complex_metadata(chunks)
 
-        vector_store = Chroma.from_documents(documents=chunks, embedding=FastEmbedEmbeddings())
+        # Initialize FastEmbedEmbeddings correctly
+        embeddings = FastEmbedEmbeddings()
+        vector_store = Chroma.from_documents(documents=chunks, embedding=embeddings)
         self.retriever = vector_store.as_retriever(
             search_type="similarity_score_threshold",
             search_kwargs={
