@@ -15,4 +15,4 @@ gtts
 pyttsx3
 streamlit-chat
 streamlit
-pysqlite3-binary
+pysqlite3
