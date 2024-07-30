@@ -35,38 +35,26 @@ def process_input():
     if st.session_state["user_input"] and len(st.session_state["user_input"].strip()) > 0:
         user_text = st.session_state["user_input"].strip()
         with st.session_state["thinking_spinner"], st.spinner("RAG-NET in Progress"):
-            try:
-                response = requests.get(f"https://arkhammapi.com/ask/?query={user_text}")
-                response.raise_for_status()
-                agent_text = response.json().get("response", "Error: No response from the server.")
-            except requests.exceptions.RequestException as e:
-                agent_text = f"Error: {e}"
-            except ValueError as e:
-                agent_text = f"Error: Unable to decode JSON response: {e}"
+            response = requests.get(f"https://arkhammapi.com/ask/?query={user_text}")
+            agent_text = response.json().get("response", "Error: No response from the server.")
 
         st.session_state["messages"].append((user_text, True))
         st.session_state["messages"].append((agent_text, False))
 
-# Function to load predefined PDFs
-def load_predefined_pdfs():
+# Function to upload and ingest a PDF file
+def upload_and_ingest(file):
     st.session_state["assistant"].clear()
     st.session_state["messages"] = []
     st.session_state["user_input"] = ""
 
-    predefined_pdf_paths = [
-        "./DSM.pdf",
-    ]
-
-    for file_path in predefined_pdf_paths:
-        with st.session_state["ingestion_spinner"], st.spinner(f"Ingesting {os.path.basename(file_path)}"):
-            try:
-                with open(file_path, "rb") as file:
-                    form_data = {"file": (os.path.basename(file_path), file, "application/pdf")}
-                    response = requests.post('https://arkhammapi.com/upload/', files=form_data)
-                    response.raise_for_status()
-                    st.success(f"{os.path.basename(file_path)} uploaded successfully and ingested.")
-            except requests.exceptions.RequestException as e:
-                st.error(f"Failed to upload {os.path.basename(file_path)}: {e}")
+    # Upload the file to the API
+    with st.session_state["ingestion_spinner"], st.spinner(f"Ingesting {file.name}"):
+        form_data = {"file": file}
+        response = requests.post('https://arkhammapi.com/upload/', files=form_data)
+        if response.status_code == 200:
+            st.success("File uploaded successfully and ingested.")
+        else:
+            st.error(f"Failed to upload file: {response.json().get('detail', 'Unknown error')}")
 
 # Main page function
 def page():
@@ -76,9 +64,11 @@ def page():
 
     st.header("Chat Psychologist AI Sandbox")
 
+    # File uploader for uploading PDF files
     st.subheader("Upload a document")
-    if st.button("Load Predefined PDFs"):
-        load_predefined_pdfs()
+    uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
+    if uploaded_file is not None:
+        upload_and_ingest(uploaded_file)
 
     st.session_state["ingestion_spinner"] = st.empty()
 
