@@ -1,3 +1,7 @@
+__import__('sqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('sqlite3')
+
 from langchain_community.vectorstores import Chroma
 from langchain_community.chat_models import ChatOllama
 from langchain_community.embeddings import FastEmbedEmbeddings
